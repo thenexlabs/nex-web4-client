@@ -1,6 +1,9 @@
 import requests
 from scapy.all import *
+import sys
 
+# Read the api key from the command line
+apiKey = sys.argv[1]
 
 def packet_callback(packet):
     # Check if packet has IP layer
@@ -114,8 +117,11 @@ def packet_callback(packet):
         dst_host_srv_count = 1
 
     # Send the collected information to the API endpoint
-    api_url = "https://example.com/api"
-    headers = {'Content-type': 'application/json'}
+    api_url = "https://api.thenex.world/.netlify/functions/network-monitor-data"
+    headers = {
+    'nex-api-key': apiKey,
+    'Content-type': 'application/json'
+    }
     data = {
         "src_ip": src_ip,
         "dst_ip": dst_ip,
@@ -163,11 +169,11 @@ def packet_callback(packet):
         "dst_host_rerror_rate": dst_host_rerror_rate,
         "dst_host_srv_rerror_rate": dst_host_srv_rerror_rate
     }
-    # response = requests.post(api_url, headers=headers, json=data)
-    # print(response.status_code)
-    # print(response.json())
+    response = requests.post(api_url, headers=headers, json=data)
+    print(response.status_code)
+    print(response.json())
     print('-----------------------------------------')
-    print(data)
+    # print(data)
 
 # Sniff the network traffic
 sniff(prn=packet_callback, store=0)
