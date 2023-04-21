@@ -1,6 +1,7 @@
 import requests
 from scapy.all import *
 import sys
+import datetime
 
 # Read the api key from the command line
 apiKey = sys.argv[1]
@@ -122,7 +123,9 @@ def packet_callback(packet):
     'nex-api-key': apiKey,
     'Content-type': 'application/json'
     }
+    now = datetime.datetime.now()
     data = {
+        "timestamp": int(now.timestamp()),
         "src_ip": src_ip,
         "dst_ip": dst_ip,
         "src_port": src_port,
