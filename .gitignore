@@ -1,4 +1,5 @@
 /build
 /__pycache__
+/dist
 
 network_client_linux_macos.spec
