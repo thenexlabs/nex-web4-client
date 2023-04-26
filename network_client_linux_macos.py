@@ -49,16 +49,16 @@ def packet_callback(packet):
       # Extract required information from the packet
       src_ip = packet[protocol_type].src
       dst_ip = packet[protocol_type].dst
-      src_port = packet[protocol_type].sport if protocol_type in ['TCP', 'UDP'] and 'sport' in packet[protocol_type].fields else None
-      dst_port = packet[protocol_type].dport if protocol_type in ['TCP', 'UDP'] and 'dport' in packet[protocol_type].fields else None
-      duration = packet.time - packet[protocol_type].time
-      service = ""
-      flag = packet[protocol_type].flags if protocol_type == 'TCP' and 'flags' in packet[protocol_type].fields else None
-      src_bytes = len(packet[protocol_type].payload) if protocol_type in ['TCP', 'UDP'] else None
+      src_port = 0
+      dst_port = 0
+      duration = packet[protocol_type].time - packet.time
+      service = "private"
+      flag = 'SF'
+      src_bytes = 0
       dst_bytes = 0
-      land = 0
+      land = 1 if src_ip == dst_ip else 0
       wrong_fragment = 0
-      # Check if the protocol has the urgptr attribute
+      # Check if the protocol has the urgptr attribute 'urgent'
       if hasattr(packet[protocol_type], 'urgptr'):
         urgent = packet[protocol_type].urgptr
       else:
@@ -98,31 +98,11 @@ def packet_callback(packet):
 
       # Extract required information from the packet
       if protocol_type == "TCP":
-        dst_bytes = packet[protocol_type].dlen if 'dlen' in packet[protocol_type].fields else None
-        land = packet[protocol_type].options if 'options' in packet[protocol_type].fields and packet[protocol_type].options == [('MSS', 536), ('WScale', 10), ('NOP', ()), ('NOP', ()), ('Timestamp', (3547056421, 0))] else None
         wrong_fragment = packet[protocol_type].flags if 'flags' in packet[protocol_type].fields and packet[protocol_type].flags & 0x1 else None
         hot = packet[protocol_type].options if 'options' in packet[protocol_type].fields and packet[protocol_type].options == [('MSS', 536), ('NOP', ()), ('WScale', 10), ('NOP', ()), ('Timestamp', (3547056421, 0))] else None
         root_shell = packet[protocol_type].flags if 'flags' in packet[protocol_type].fields and packet[protocol_type].flags & 0x4000 else None
         su_attempts = packet[protocol_type].options if 'options' in packet[protocol_type].fields and packet[protocol_type].options == [('MSS', 536), ('NOP', ()), ('WScale', 10), ('NOP', ()), ('Timestamp', (3547056421, 0))] else None
         num_root = packet[protocol_type].options if 'options' in packet[protocol_type].fields and packet[protocol_type].options == [('MSS', 536), ('NOP', ()), ('WScale', 10), ('NOP', ()), ('Timestamp', (3547056421, 0))] else None
-        dst_bytes = packet[protocol_type].dsize
-        if packet[protocol_type].flags & 0x010:
-            land = 1
-        if packet[protocol_type].flags & 0x080:
-            num_failed_logins += 1
-        if packet[protocol_type].flags & 0x020:
-            logged_in = 1
-        if packet[protocol_type].flags & 0x008:
-            num_compromised += 1
-        if packet[protocol_type].flags & 0x002:
-            root_shell = 1
-        if packet[protocol_type].flags & 0x001:
-            su_attempted = 1
-        if packet[protocol_type].flags & 0x004:
-            num_root += 1
-        if packet[protocol_type].flags & 0x040:
-            num_file_creations += 1
-        src_bytes = len(packet[protocol_type].payload)
         count = 1
         srv_count = 1
         serror_rate = packet[protocol_type].sprintf("%.2f%%", packet[protocol_type].serror)
@@ -134,6 +114,38 @@ def packet_callback(packet):
         srv_diff_host_rate = packet[protocol_type].sprintf("%.2f%%", packet[protocol_type].sprintf(packet[protocol_type].diff_syn) / float(packet[protocol_type].sprintf(packet[protocol_type].srv_count)))
         dst_host_count = 1
         dst_host_srv_count = 1
+
+      # Extract service
+      # Check if the packet has a TCP or UDP layer
+      if packet.haslayer(TCP) or packet.haslayer(UDP):
+        # Get the source and destination ports
+        src_port = packet.sport
+        dst_port = packet.dport
+
+        # Determine the service based on the port number
+        if src_port == 80 or dst_port == 80:
+            service = 'http'
+        elif src_port == 22 or dst_port == 22:
+            service = 'ssh'
+        elif src_port == 1234 or dst_port == 1234:
+            service = 'private_1234'
+        elif src_port == 5678 or dst_port == 5678:
+            service = 'domain_u'
+        else:
+            service = 'private'
+
+      # Extract src bytes and dst_bytes
+      # Check if the packet has an IP layer
+      if packet.haslayer(IP):
+        # Get the IP layer
+        ip_layer = packet[IP]
+
+        # Get the source and destination IP addresses
+        src_bytes = len(ip_layer)
+        dst_bytes = len(ip_layer.payload)
+
+        # Get the packet length
+        packet_length = ip_layer.len
 
       # Send the collected information to the API endpoint
       api_url = "https://api.thenex.world/.netlify/functions/network-monitor-data"
