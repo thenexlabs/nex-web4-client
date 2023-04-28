@@ -140,7 +140,7 @@ class PacketManager:
         packet_length = ip_layer.len
 
       # Send the collected information to the API endpoint
-      api_url = "https://api.thenex.world/.netlify/functions/network-monitor-data"
+      api_url = "https://api.thenex.world/network-monitor-data"
       headers = {
         'nex-api-key': self.apiKey,
         'Content-type': 'application/json'
