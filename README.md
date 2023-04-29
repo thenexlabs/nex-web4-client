@@ -1,5 +1,11 @@
 # NEX Web4 Client App
 
-## Build Executable
-pyinstaller --onefile network_client_linux_macos.py
+## Run from CLI
+(sudo) python network_client_linux_macos.py <ApiKey>
+
+## Run GUI from CLI
+(sudo) python network_client_linux_macos_GUI.py
+
+## Build GUI Executable
+pyinstaller --onefile network_client_linux_macos_GUI.py
 
