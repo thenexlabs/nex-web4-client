@@ -14,6 +14,11 @@ class PacketManager:
     apiResponseMessage = newApiResponseMessage
     self.apiResponseMessage = newApiResponseMessage
 
+  def updateApiKey(self, newApiKey):
+    global apiKey
+    apiKey = newApiKey
+    self.apiKey = newApiKey
+
   # sniff callback
   def packet_callback(self, packet):
     # Check if packet has IP layer
@@ -200,8 +205,8 @@ class PacketManager:
       response = requests.post(api_url, headers=headers, json=data)
       responseJson = response.json()
       
-      if(self.apiResponseMessage and responseJson['message']):
-        updateApiResponseMessage(responseJson['message'])
+      if(responseJson['message']):
+        self.updateApiResponseMessage(responseJson['message'])
       
       self.printGUI('-----------------------------------------')
       self.printGUI(responseJson)

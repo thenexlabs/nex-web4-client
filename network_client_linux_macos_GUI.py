@@ -37,6 +37,7 @@ def start_sniff():
   # grab apikey from input
   global apiKey
   apiKey = apikey_entry.get()
+  pm.updateApiKey(apiKey)
   printGUI(f'API key: {apiKey}')
 
   if not apiKey:
@@ -53,6 +54,7 @@ def start_sniff():
 
 def stop_sniff(packet):
   # Return True to stop sniffing when the 'running' flag is False
+  global apiResponseMessage
   if(apiResponseMessage == 'Unauthorized'):
     printGUI("Please enter a valid API key.")
     return True
