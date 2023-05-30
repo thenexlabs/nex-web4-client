@@ -22,5 +22,11 @@ sudo pyinstaller --onefile network_client_linux_macos_GUI.py
 3) python3 network_client_linux_macos.py your_apiKey
 4) Press Ctrl-b, then d. This will detach the current session.
 
+### List tmux sessions
+1) tmux ls
+
+### Open tmux session
+1) tmux attach your_session_name
+
 ### End tmux session
 1) tmux kill-session -t your_session_name
