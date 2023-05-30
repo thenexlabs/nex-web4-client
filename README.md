@@ -26,7 +26,7 @@ sudo pyinstaller --onefile network_client_linux_macos_GUI.py
 1) tmux ls
 
 ### Open tmux session
-1) tmux attach your_session_name
+1) tmux attach -t your_session_name
 
 ### End tmux session
 1) tmux kill-session -t your_session_name
