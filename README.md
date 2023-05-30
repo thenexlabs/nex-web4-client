@@ -1,17 +1,17 @@
 # NEX Web4 Client App
 
 ## Install neccessary packages
-1) python3 install scapy
+1) sudo pip install scapy GPUtil psutil requests
 
 ### On EC2 install neccessary packages
 1) sudo yum install python3-pip
-2) sudo pip install scapy
+2) sudo pip install scapy GPUtil psutil requests
 
 ## Run from CLI
-sudo python network_client_linux_macos.py your_apiKey
+sudo python3 network_client_linux_macos.py your_apiKey
 
 ## Run GUI from CLI
-sudo python network_client_linux_macos_GUI.py
+sudo python3 network_client_linux_macos_GUI.py
 
 ## Build GUI Executable
 sudo pyinstaller --onefile network_client_linux_macos_GUI.py

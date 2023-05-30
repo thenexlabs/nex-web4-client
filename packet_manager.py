@@ -1,4 +1,4 @@
-import requests
+import psutil, GPUtil, requests
 from scapy.all import *
 import datetime
 
@@ -144,6 +144,17 @@ class PacketManager:
         # Get the packet length
         packet_length = ip_layer.len
 
+      # track CPU usage
+      cpu_usage = psutil.cpu_percent()
+
+      # track GPU usage
+      gpus = GPUtil.getGPUs()
+      gpu_data = {}
+      for i, gpu in enumerate(gpus):
+        gpu_usage = gpu.load
+        gpu_data[f"gpu_{i+1}_usage"] = gpu_usage
+
+
       # Send the collected information to the API endpoint
       api_url = "https://api.thenex.world/network-monitor-data"
       headers = {
@@ -152,6 +163,7 @@ class PacketManager:
       }
       now = datetime.datetime.now()
       data = {
+        "cpu_usage": cpu_usage,
         "timestamp": int(now.timestamp()),
         "src_ip": src_ip,
         "dst_ip": dst_ip,
@@ -160,12 +172,12 @@ class PacketManager:
         "duration": duration,
         "protocol_type": protocol_type,
         "service": service,
-        "flag": flag,
+        #"flag": flag,
         "src_bytes": src_bytes,
         "dst_bytes": dst_bytes,
-        "land": land,
+        #"land": land,
         # "wrong_fragment": wrong_fragment,
-        "urgent": urgent,
+        #"urgent": urgent,
         # "hot": hot,
         # "num_failed_logins": num_failed_logins,
         # "logged_in": logged_in,
@@ -199,9 +211,9 @@ class PacketManager:
         # "dst_host_rerror_rate": dst_host_rerror_rate,
         # "dst_host_srv_rerror_rate": dst_host_srv_rerror_rate
       }
-      # if(data.src_ip == 'ff:ff:ff:ff:ff:ff'){
-      # }else if(data.dst_ip == 'ff:ff:ff:ff:ff:ff'){
-      # }else{
+      if len(gpus) > 0:
+        data["gpu_usage"] = gpu_data
+
       response = requests.post(api_url, headers=headers, json=data)
       responseJson = response.json()
       
