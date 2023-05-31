@@ -151,7 +151,6 @@ class PacketManager:
       gpus = GPUtil.getGPUs()
       gpu_data = {}
 
-      print(cpu_usage, gpu_data)
       # Send the collected information to the API endpoint
       api_url = "https://api.thenex.world/network-monitor-data"
       headers = {
