@@ -150,11 +150,8 @@ class PacketManager:
       # track GPU usage
       gpus = GPUtil.getGPUs()
       gpu_data = {}
-      for i, gpu in enumerate(gpus):
-        gpu_usage = gpu.load
-        gpu_data[f"gpu_{i+1}_usage"] = gpu_usage
 
-
+      print(cpu_usage, gpu_data)
       # Send the collected information to the API endpoint
       api_url = "https://api.thenex.world/network-monitor-data"
       headers = {
@@ -211,9 +208,10 @@ class PacketManager:
         # "dst_host_rerror_rate": dst_host_rerror_rate,
         # "dst_host_srv_rerror_rate": dst_host_srv_rerror_rate
       }
-      if len(gpus) > 0:
-        data["gpu_usage"] = gpu_data
-
+      for i, gpu in enumerate(gpus):
+        gpu_usage = gpu.load
+        data[f"gpu_{i+1}_usage"] = gpu_usage
+        
       response = requests.post(api_url, headers=headers, json=data)
       responseJson = response.json()
       
