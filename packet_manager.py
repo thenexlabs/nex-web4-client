@@ -8,6 +8,7 @@ class PacketManager:
     self.apiKey = apiKey
     self.printGUI = printGUI
     self.apiResponseMessage = apiResponseMessage
+    self.packetsBuffer = []
 
   def updateApiResponseMessage(self, newApiResponseMessage):
     global apiResponseMessage
@@ -151,12 +152,6 @@ class PacketManager:
       gpus = GPUtil.getGPUs()
       gpu_data = {}
 
-      # Send the collected information to the API endpoint
-      api_url = "https://api.thenex.world/network-monitor-data"
-      headers = {
-        'nex-api-key': self.apiKey,
-        'Content-type': 'application/json'
-      }
       now = datetime.datetime.now()
       data = {
         "cpu_usage": cpu_usage,
@@ -210,18 +205,40 @@ class PacketManager:
       for i, gpu in enumerate(gpus):
         gpu_usage = gpu.load
         data[f"gpu_{i+1}_usage"] = gpu_usage
-        
-      response = requests.post(api_url, headers=headers, json=data)
-      responseJson = response.json()
-      
-      if(responseJson['message']):
-        self.updateApiResponseMessage(responseJson['message'])
       
       self.printGUI('-----------------------------------------')
-      self.printGUI(responseJson)
-      # printGUI(response.status_code)
       
-      # }
-      # print(data)
+      self.packetsBuffer.append(data)
+      numPacketsUntilAddedToDB = 500
+
+      if( len(self.packetsBuffer) >= numPacketsUntilAddedToDB ):
+        # Send the collected information to the API endpoint
+        api_url = "https://api.thenex.world/network-monitor-data"
+        headers = {
+          'nex-api-key': self.apiKey,
+          'Content-type': 'application/json'
+        }
+
+        json = {
+          packets: self.packetsBuffer
+        }
+
+        response = requests.post(
+          api_url, 
+          headers=headers, 
+          json=json
+        )
+        responseJson = response.json()
+      
+        self.printGUI(responseJson)
+        #self.printGUI(response.status_code)
+
+        if(responseJson['message']):
+          self.updateApiResponseMessage(responseJson['message'])
+
+        self.packetsBuffer = []
+
+      self.printGUI(self.packetsBuffer[len(self.packetsBuffer)-1])
+
     except Exception as e:
       self.printGUI(e)
