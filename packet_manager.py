@@ -220,7 +220,7 @@ class PacketManager:
         }
 
         json = {
-          packets: self.packetsBuffer
+          'packets': self.packetsBuffer
         }
 
         response = requests.post(
