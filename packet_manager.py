@@ -207,7 +207,8 @@ class PacketManager:
         data[f"gpu_{i+1}_usage"] = gpu_usage
       
       self.printGUI('-----------------------------------------')
-      
+      self.printGUI(len(self.packetsBuffer))
+
       self.packetsBuffer.append(data)
       numPacketsUntilAddedToDB = 500
 
@@ -235,10 +236,11 @@ class PacketManager:
 
         if(responseJson['message']):
           self.updateApiResponseMessage(responseJson['message'])
+          # if('Data inserted successfully' == responseJson['message']):
+          #   self.packetsBuffer = []
 
         self.packetsBuffer = []
-
-      self.printGUI(self.packetsBuffer[len(self.packetsBuffer)-1])
+      # self.printGUI(self.packetsBuffer[len(self.packetsBuffer)-1])
 
     except Exception as e:
       self.printGUI(e)
