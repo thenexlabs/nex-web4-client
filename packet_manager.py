@@ -210,7 +210,8 @@ class PacketManager:
       self.printGUI(len(self.packetsBuffer))
 
       self.packetsBuffer.append(data)
-      numPacketsUntilAddedToDB = 500
+
+      numPacketsUntilAddedToDB = 300
 
       if( len(self.packetsBuffer) >= numPacketsUntilAddedToDB ):
         # Send the collected information to the API endpoint
@@ -244,3 +245,4 @@ class PacketManager:
 
     except Exception as e:
       self.printGUI(e)
+      self.packetsBuffer = []
