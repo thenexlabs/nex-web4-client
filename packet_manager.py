@@ -22,21 +22,22 @@ class PacketManager:
 
   # sniff callback
   def packet_callback(self, packet):
+   protocol_types = []
     # Check if packet has IP layer
     if IP in packet:
-      protocol_type = "IP"
+        protocol_types.append("IP")
     # Check if packet has TCP layer
-    elif TCP in packet:
-      protocol_type = "TCP"
+    if TCP in packet:
+        protocol_types.append("TCP")
     # Check if packet has UDP layer
-    elif UDP in packet:
-      protocol_type = "UDP"
+    if UDP in packet:
+        protocol_types.append("UDP")
     # Check if packet has DNS layer
-    elif DNS in packet:
-      protocol_type = "DNS"
+    if DNS in packet:
+        protocol_types.append("DNS")
     # Check if packet has Ether layer
-    elif Ether in packet:
-      protocol_type = "Ether"
+    if Ether in packet:
+        protocol_types.append("Ether")
     # Otherwise, print unknown protocol type
     else:
       protocol_type = "Unknown"
